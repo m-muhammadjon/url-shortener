@@ -8,6 +8,7 @@ db.sqlite3
 files/
 # Backup files #
 *.bak
+assets/
 
 # If you are using PyCharm #
 # User-specific stuff
