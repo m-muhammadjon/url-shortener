@@ -1,14 +1,11 @@
-import time
+import json
 
-from django.shortcuts import render, redirect
-from django.http import JsonResponse, HttpResponseRedirect
-from django.utils.crypto import get_random_string
 from django.core.validators import URLValidator, ValidationError
-from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
-
+from django.http import JsonResponse, HttpResponseRedirect
+from django.shortcuts import render, redirect
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
-import json
 from main import models
 from main.utils import get_valid_shorted_link
 
@@ -21,11 +18,10 @@ def home(request):
 @require_POST
 def short_url(request):
     validator = URLValidator()
-    print(request.body)
     data = json.loads(request.body)
     user_id = data.get('user_id')
     link = data.get('link')
-    if not 'http' in link:
+    if 'http' not in link:
         link = f'http://{link}'
     try:
         validator(link)
@@ -48,11 +44,7 @@ def short_url(request):
 
 
 def redirect_to_original_link(request, shorted):
-    print('iya')
-    if shorted:
-        print('shorted')
-        # print(shorted)
-        print(type(shorted))
+    if shorted and shorted != 'favicon.ico':
         link = models.ShortedLink.objects.get(shorted=shorted)
         url = link.url
         if 'http' not in url:
@@ -61,7 +53,7 @@ def redirect_to_original_link(request, shorted):
         link.visitors.add(visitor)
         return redirect(url)
     else:
-        home(request)
+        return HttpResponseRedirect('/')
 
 
 def history(request):
@@ -72,13 +64,11 @@ def history(request):
         links = user.links.all()
     except models.User.DoesNotExist:
         pass
-    print(links)
     return render(request, 'history.html', {'links': links})
 
 
 def shorted_detail(request, shorted):
     link = models.ShortedLink.objects.get(shorted=shorted)
-    print(link.get_daily_count())
     host = request.get_host()
     return render(request, 'historyDetail.html', {'host': host,
                                                   'link': link})

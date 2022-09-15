@@ -13,6 +13,9 @@ class User(models.Model):
 class Visitor(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return f'seen at {self.created_at}'
+
 
 class ShortedLink(models.Model):
     user = models.ForeignKey(User,
