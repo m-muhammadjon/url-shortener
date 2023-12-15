@@ -1,0 +1,4 @@
+-r base.txt
+
+pre-commit==3.3.3
+ipython==8.14.0
